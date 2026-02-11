@@ -2,11 +2,11 @@ from app.data.Instance import Instance
 from app.simulation.envs.Env import Env
 import gymnasium as gym
 from app.simulation.policies.PolicyEvaluation import PolicyEvaluation
-from app.simulation.envs.RandomEnv import RandomEnv
-from app.simulation.policies.Random import Random
+from app.simulation.policies.ChildPolicy import ChildPolicy
 import pandas as pd
-from app.domain.Server import Server
 from gymnasium.envs.registration import register
+from gymnasium.error import Error as GymError
+import os
 
 
 
@@ -16,13 +16,16 @@ instance_set = range(50)
 score = 0
 NB_RUNS_INST = 1
 is_valid = True
-model = Random("random") ## TODO loading
-## TODO replace with your env
-register(
-    id="Random_Env",
-    entry_point="app.simulation.envs.RandomEnv:RandomEnv", 
-)
-env_id = "Random_Env" 
+model = ChildPolicy("child_greedy")
+try:
+    register(
+        id="Child_Env_Eval",
+        entry_point="app.simulation.envs.ChildEnv:ChildEnv",
+    )
+except GymError:
+    # Already registered in current process.
+    pass
+env_id = "Child_Env_Eval"
 
 
 def check_solution(instance, solution_path):
@@ -105,6 +108,7 @@ for instance_id in instance_set:
 		print(f"\n\nEvaluation of instance {instance_id} and run {run}")   
 		env = gym.make(env_id, mode=Env.MODE.TEST, instance=instance)
 		sol_file = f"result_tmp_{instance_id}_{run}.csv"
+		os.makedirs("./results/tmp/", exist_ok=True)
 		model.simulate(env, print_logs=False, save_to_csv=True, path="./results/tmp/", file_name=sol_file)
 		policy_evaluation = PolicyEvaluation(instance.timeline, instance.appointments, clients_history=model.customers_history)
 		policy_evaluation.evaluate()
