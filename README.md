@@ -2,7 +2,7 @@
 
 ## Run your modified model
 ## To make it is work, you have to modify ChildEnv.py and ChildPolicy.py
-## Tou can duplicate these two files to test as many policies as you want.
+## You can duplicate these two files to test as many policies as you want.
 
 ```bash
 python -m app.main
@@ -26,5 +26,6 @@ python -m app.run_random
 ## You can evaluate your model on 50 pregenerated instances
 ## It allows you to compare yourself
 ```bash
-python -m app.èvaluate
+python -m app.evaluate
+
 ```
